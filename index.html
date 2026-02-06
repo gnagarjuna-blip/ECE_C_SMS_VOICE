@@ -13,12 +13,12 @@
         .is-p { border-left-color: #2e7d32; background: #f1f8f1; }
         .footer { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; border-top: 1px solid #ddd; z-index: 1001; border-radius: 20px 20px 0 0; }
         .action-btns { display: flex; gap: 8px; }
-        .btn-round { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; color: white; font-weight: bold; }
+        .btn-round { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 16px; color: white; font-weight: bold; border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .bg-wa { background: #25d366; }
         .bg-call { background: #0d6efd; }
         #history-view { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; padding:20px; }
         .history-card { background: white; height: 85%; border-radius: 15px; padding: 20px; overflow-y: auto; }
-        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 11px; white-space: pre-wrap; color: #333; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 11px; white-space: pre-wrap; color: #333; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -26,22 +26,20 @@
 <div id="history-view">
     <div class="history-card shadow">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="m-0 fw-bold text-primary">📜 SAVED REPORTS</h5>
+            <h5 class="m-0 fw-bold text-primary">📜 SAVED HISTORY</h5>
             <button class="btn-close" onclick="closeHistory()"></button>
         </div>
         <div id="history-list"></div>
-        <button class="btn btn-outline-danger btn-sm w-100 mt-3" onclick="clearHistory()">CLEAR HISTORY</button>
+        <button class="btn btn-outline-danger btn-sm w-100 mt-3" onclick="clearHistory()">DELETE ALL</button>
     </div>
 </div>
 
-<div class="header">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h5 class="m-0 fw-bold">G. NAGARJUNA (ECE)</h5>
-            <small id="current-date" class="opacity-75"></small>
-        </div>
+<div class="header text-center">
+    <h5 class="m-0 fw-bold">G. NAGARJUNA (ECE)</h5>
+    <div class="d-flex justify-content-between align-items-center mt-2">
+        <small id="current-date" class="opacity-75"></small>
         <div class="text-end">
-            <div id="perc-ui" style="font-size: 1.5rem; font-weight: 800; color: #ffd600; line-height: 1;">0%</div>
+            <div id="perc-ui" style="font-size: 1.4rem; font-weight: 800; color: #ffd600; line-height: 1;">0%</div>
             <div id="count-ui" style="font-size: 0.7rem; font-weight: bold;">(0/0)</div>
         </div>
     </div>
@@ -79,13 +77,16 @@
     </div>
     
     <div class="mb-2">
-        <textarea id="custom-msg" class="form-control form-control-sm" rows="2" style="font-size: 11px;">ATTEDENCE Alert:Respected  పేరెంట్,
+        <textarea id="custom-msg" class="form-control form-control-sm" rows="2" style="font-size: 11px; background: #fffde7;">ATTEDENCE Alert:RESPECTED  పేరెంట్,
 
-        ఈ రోజు మీ వార్డ్ కాలేజ్ లో హాజరు కాలేదని తెలియజేస్తున్నాము.YOUR WARD IS ABSENT TODAY 
+        ఈ రోజు మీ వార్డ్ కాలేజ్ లో హాజరు కాలేదని తెలియజేస్తున్నాము.
+		
+		     YOUR WARD IS ABSENT TODAY
+			 
           BHARATH INSTITUTE OF EGINEERING TECHNOLOGY ,
-		  ECE DEPORTMENT,
-		  CLASS INCHARGE G.NAGARJUNA</textarea>. 
-▶️ Listen Voice Note: https://docs.google.com/uc?export=open&id=14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc</textarea>
+		  
+		  CLASS INCHARGE G.NAGARJUNA.
+Please click below to listen to the Voice Note:</textarea>
     </div>
 
     <div class="row g-1">
@@ -119,10 +120,10 @@
             div.innerHTML = `
                 <div onclick="toggleAtt('${s.r}')" style="flex-grow:1;">
                     <strong class="d-block">${s.r}</strong>
-                    <small class="text-muted">${s.n}</small>
+                    <small class="text-muted fw-bold">${s.n.toUpperCase()}</small>
                 </div>
                 <div class="action-btns">
-                    <button onclick="sendWA('${s.p}', '${s.r}')" class="btn-round bg-wa">WA</button>
+                    <button onclick="sendWA('${s.p}', '${s.n}')" class="btn-round bg-wa">WA</button>
                     <a href="tel:${s.p}" class="btn-round bg-call">📞</a>
                 </div>
             `;
@@ -146,10 +147,25 @@
         document.getElementById('count-ui').innerText = `(${present}/${total})`;
     }
 
+    // Individual Styled WhatsApp Message
+    function sendWA(phone, name) {
+        const baseMsg = document.getElementById('custom-msg').value;
+        const voiceLink = "https://docs.google.com/uc?export=open&id=14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc";
+        
+        // Designing the "Colorful" Message
+        const styledMsg = `🟢 *ECE ATTENDANCE ALERT* 🟢\n\n` +
+                          `👤 *Student Name:* ${name.toUpperCase()}\n` +
+                          `📝 *Status:* _ABSENT_\n\n` +
+                          `${baseMsg}\n\n` +
+                          `▶️ *LISTEN HERE:* ${voiceLink}\n\n` +
+                          `🙏 *Regards,* \n*G. Nagarjuna (ECE Dept)*`;
+
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(styledMsg)}`, '_blank');
+    }
+
     function formatAbsentees(absList) {
-        if (absList.length === 0) return "None! All present.";
-        let reportStr = "";
-        let lastPrefix = "";
+        if (absList.length === 0) return "All present.";
+        let reportStr = ""; let lastPrefix = "";
         absList.forEach((s, index) => {
             const fullRoll = s.r;
             const prefix = fullRoll.substring(0, fullRoll.length - 2);
@@ -157,9 +173,7 @@
             if (prefix !== lastPrefix) {
                 reportStr += (index === 0 ? "" : "\n") + fullRoll;
                 lastPrefix = prefix;
-            } else {
-                reportStr += ", " + suffix;
-            }
+            } else { reportStr += ", " + suffix; }
         });
         return reportStr;
     }
@@ -168,37 +182,21 @@
         const sec = document.getElementById('sec-sel').value;
         const period = document.getElementById('period-sel').value;
         const abs = students[sec].filter(s => att[s.r] === 'A');
-        return `📊 *ATTENDANCE REPORT*
-📝 *Subject:* ECA
-👨‍🏫 *Faculty:* G.Nagarjuna
-📌 *Section:* ${sec} (${period})
-📅 *Date:* ${new Date().toLocaleDateString()}
-📈 *Percentage:* ${document.getElementById('perc-ui').innerText}
-
-🚫 *ABSENTEES:*
-${formatAbsentees(abs)}
-
-_Generated by ECE Attendance System_`;
-    }
-
-    function sendWA(phone, roll) {
-        const baseMsg = document.getElementById('custom-msg').value;
-        const fullMsg = `Roll No: ${roll}\n${baseMsg}`;
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(fullMsg)}`, '_blank');
+        return `📊 *ATTENDANCE REPORT*\n📝 *Subject:* ECA\n👨‍🏫 *Faculty:* G.Nagarjuna\n📌 *Sec:* ${sec} (${period})\n📅 *Date:* ${new Date().toLocaleDateString()}\n📈 *Att:* ${document.getElementById('perc-ui').innerText}\n\n🚫 *ABSENTEES:*\n${formatAbsentees(abs)}`;
     }
 
     function saveRecord() {
         const report = generateReport();
-        const records = JSON.parse(localStorage.getItem('ece_v4_hist') || '[]');
+        const records = JSON.parse(localStorage.getItem('ece_v5_hist') || '[]');
         records.unshift({ time: new Date().toLocaleString(), data: report });
-        localStorage.setItem('ece_v4_hist', JSON.stringify(records.slice(0, 50)));
-        alert("Success: Record Saved!");
+        localStorage.setItem('ece_v5_hist', JSON.stringify(records.slice(0, 50)));
+        alert("Report Saved!");
     }
 
     function openHistory() {
-        const records = JSON.parse(localStorage.getItem('ece_v4_hist') || '[]');
+        const records = JSON.parse(localStorage.getItem('ece_v5_hist') || '[]');
         const list = document.getElementById('history-list');
-        list.innerHTML = records.length ? '' : '<p class="text-center">Empty.</p>';
+        list.innerHTML = records.length ? '' : '<p class="text-center">No records.</p>';
         records.forEach(rec => {
             const div = document.createElement('div');
             div.className = 'mb-3 border-bottom pb-2';
@@ -209,7 +207,7 @@ _Generated by ECE Attendance System_`;
     }
 
     function closeHistory() { document.getElementById('history-view').style.display = 'none'; }
-    function clearHistory() { if(confirm("Clear?")) { localStorage.removeItem('ece_v4_hist'); openHistory(); } }
+    function clearHistory() { if(confirm("Clear?")) { localStorage.removeItem('ece_v5_hist'); openHistory(); } }
     function shareGroupWA() { window.open(`https://wa.me/?text=${encodeURIComponent(generateReport())}`, '_blank'); }
     function copyText() { navigator.clipboard.writeText(generateReport()); alert("Copied!"); }
     

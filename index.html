@@ -6,46 +6,60 @@
     <title>ECE Attendance Pro - G. Nagarjuna</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background: #f0f2f5; padding-bottom: 280px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .header { background: #1a237e; color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid #ffd600; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .student-item { background: white; margin: 8px; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 8px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer;}
+        body { background: #f0f2f5; padding-bottom: 300px; font-family: 'Segoe UI', sans-serif; }
+        .header { background: #1a237e; color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid #ffd600; }
+        .student-item { background: white; margin: 8px; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 8px solid #ccc; cursor: pointer; }
         .is-a { border-left-color: #d32f2f; background: #fff5f5; }
         .is-p { border-left-color: #2e7d32; background: #f1f8f1; }
-        .footer { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); z-index: 1001; }
-        .perc-display { font-size: 1.6rem; font-weight: 800; color: #ffd600; line-height: 1; }
-        .stats-label { font-size: 0.7rem; letter-spacing: 1px; font-weight: bold; }
-        .btn-action { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; }
+        .footer { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; border-top: 1px solid #ddd; z-index: 1001; border-radius: 20px 20px 0 0; }
+        .perc-display { font-size: 1.6rem; font-weight: 800; color: #ffd600; }
+        /* History Modal Styling */
+        #history-view { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; padding:20px; }
+        .history-card { background: white; height: 80%; border-radius: 15px; padding: 20px; overflow-y: auto; }
     </style>
 </head>
 <body>
+
+<div id="history-view">
+    <div class="history-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="m-0">📜 Attendance Records</h4>
+            <button class="btn-close" onclick="closeHistory()"></button>
+        </div>
+        <div id="history-list"></div>
+        <button class="btn btn-danger w-100 mt-3" onclick="clearHistory()">Clear All Records</button>
+    </div>
+</div>
 
 <div class="header">
     <div class="d-flex justify-content-between align-items-center">
         <div>
             <h5 class="m-0 fw-bold">G. NAGARJUNA (ECE)</h5>
-            <small id="date-time" class="opacity-75"></small>
+            <small id="current-date" class="opacity-75"></small>
         </div>
         <div class="text-end">
             <div id="perc-ui" class="perc-display">0%</div>
-            <div class="stats-label">PRESENT</div>
+            <div style="font-size: 0.7rem; font-weight: bold;">PRESENT</div>
         </div>
     </div>
     
     <div class="mt-3 row g-2">
         <div class="col-4">
-            <select id="sec-sel" class="form-select form-select-sm shadow-sm" onchange="loadList()">
+            <select id="sec-sel" class="form-select form-select-sm" onchange="loadList()">
                 <option value="A">Sec A</option>
                 <option value="B">Sec B</option>
             </select>
         </div>
         <div class="col-4">
-            <select id="period-sel" class="form-select form-select-sm shadow-sm" onchange="saveProgress()">
-                <option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option>
-                <option value="P4">P4</option><option value="P5">P5</option><option value="P6">P6</option><option value="P7">P7</option>
+            <select id="period-sel" class="form-select form-select-sm">
+                <option value="P1">P1</option><option value="P2">P2</option>
+                <option value="P3">P3</option><option value="P4">P4</option>
+                <option value="P5">P5</option><option value="P6">P6</option>
+                <option value="P7">P7</option>
             </select>
         </div>
         <div class="col-4">
-            <div class="btn-group w-100 shadow-sm">
+            <div class="btn-group w-100">
                 <input type="radio" class="btn-check" name="m" id="p" value="P" checked>
                 <label class="btn btn-outline-light btn-sm fw-bold" for="p">P</label>
                 <input type="radio" class="btn-check" name="m" id="a" value="A">
@@ -58,26 +72,21 @@
 <div class="container mt-2" id="list"></div>
 
 <div class="footer">
-    <div class="mb-2 d-flex gap-2">
-        <button class="btn btn-sm btn-warning w-50 fw-bold" onclick="saveProgress()">💾 SAVE DATA</button>
-        <button class="btn btn-sm btn-secondary w-50 fw-bold" onclick="resetAttendance()">🔄 RESET</button>
+    <div class="d-flex gap-2 mb-2">
+        <button class="btn btn-primary flex-grow-1 fw-bold" onclick="saveRecord()">💾 SAVE</button>
+        <button class="btn btn-info text-white flex-grow-1 fw-bold" onclick="openHistory()">👁️ VIEW SAVED</button>
     </div>
+    
     <div class="mb-2">
-        <textarea id="custom-msg" class="form-control form-control-sm" rows="1">ATTEDENCE Alert: ప్రియ పేరెంట్,
-
-        ఈ రోజు మీ వార్డ్ కాలేజ్ లో హాజరు కాలేదని తెలియజేస్తున్నాము.Your ward is ABSENT today 
-            BHARATH INSTITUTE OF EGINEERING TECHNOLOGY ,ECE DEPORTMENT.</textarea>
+        <textarea id="custom-msg" class="form-control form-control-sm" rows="2">ECE Alert: Your child is ABSENT for ECA class.
+Faculty: G.Nagarjuna
+Voice Note: https://drive.google.com/file/d/14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc/view?usp=drivesdk</textarea>
     </div>
+
     <div class="row g-2">
-        <div class="col-12">
-            <button class="btn btn-success w-100 fw-bold py-2 shadow-sm" onclick="shareGroupReport()">🚀 WHATSAPP REPORT</button>
-        </div>
-        <div class="col-6">
-            <button class="btn btn-outline-danger w-100 fw-bold btn-sm" onclick="sendVoiceSMS()">🎤 BULK SMS</button>
-        </div>
-        <div class="col-6">
-            <button class="btn btn-outline-dark w-100 fw-bold btn-sm" onclick="copyToClipboard()">📋 COPY TEXT</button>
-        </div>
+        <div class="col-12"><button class="btn btn-success w-100 fw-bold" onclick="shareWA()">🚀 WHATSAPP REPORT</button></div>
+        <div class="col-6"><button class="btn btn-outline-danger w-100 fw-bold btn-sm" onclick="sendSMS()">🎤 BULK SMS</button></div>
+        <div class="col-6"><button class="btn btn-outline-dark w-100 fw-bold btn-sm" onclick="copyText()">📋 COPY TEXT</button></div>
     </div>
 </div>
 
@@ -85,40 +94,25 @@
     const students = {
         "A": [
             {r: "24E11A04D9", n: "K.bharath", p: "919059144275"},
-            {r: "24E11A0402", n: "P.Kumar", p: "919059144280"},
-            {r: "24E11A0403", n: "Student 3", p: "9100000000"},
-            {r: "24E11A0404", n: "Student 4", p: "9100000000"}
+            {r: "24E11A0402", n: "P.Kumar", p: "919177937305"}
         ],
         "B": []
     };
 
     let att = {};
-    const STORAGE_KEY = 'attendance_backup';
 
     function loadList() {
         const sec = document.getElementById('sec-sel').value;
         const container = document.getElementById('list');
         container.innerHTML = '';
-        
-        // Load from storage or default to Present
-        const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-        att = savedData[sec] || {};
-
+        att = {};
         students[sec].forEach(s => {
-            if (!att[s.r]) att[s.r] = 'P';
-            
+            att[s.r] = 'P';
             const div = document.createElement('div');
-            div.className = `student-item ${att[s.r] === 'P' ? 'is-p' : 'is-a'}`;
+            div.className = 'student-item is-p';
             div.id = `card-${s.r}`;
-            div.innerHTML = `
-                <div onclick="toggleAtt('${s.r}')" style="flex-grow:1;">
-                    <strong class="d-block">${s.r}</strong>
-                    <small class="text-muted">${s.n}</small>
-                </div>
-                <div class="d-flex gap-2">
-                    <a href="tel:${s.p}" class="btn-action bg-primary text-white">📞</a>
-                </div>
-            `;
+            div.onclick = () => toggleAtt(s.r);
+            div.innerHTML = `<div><strong class="d-block">${s.r}</strong><small class="text-muted">${s.n}</small></div>`;
             container.appendChild(div);
         });
         updateStats();
@@ -127,100 +121,97 @@
     function toggleAtt(roll) {
         const mode = document.querySelector('input[name="m"]:checked').value;
         att[roll] = mode;
-        const card = document.getElementById(`card-${roll}`);
-        card.className = 'student-item ' + (mode === 'P' ? 'is-p' : 'is-a');
+        document.getElementById(`card-${roll}`).className = 'student-item ' + (mode === 'P' ? 'is-p' : 'is-a');
         updateStats();
-        saveProgress(); // Auto-save on every click
-    }
-
-    function saveProgress() {
-        const sec = document.getElementById('sec-sel').value;
-        let savedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-        savedData[sec] = att;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
-        console.log("Progress Saved");
-    }
-
-    function resetAttendance() {
-        if(confirm("Clear all marks for this section?")) {
-            att = {};
-            saveProgress();
-            loadList();
-        }
     }
 
     function updateStats() {
         const sec = document.getElementById('sec-sel').value;
         const total = students[sec].length;
-        if(total === 0) return;
         const present = Object.values(att).filter(v => v === 'P').length;
-        document.getElementById('perc-ui').innerText = Math.round((present/total)*100) + '%';
+        document.getElementById('perc-ui').innerText = total ? Math.round((present/total)*100) + '%' : '0%';
     }
 
-    function formatRollNumbers(absentees) {
-        if (absentees.length === 0) return "None! All present.";
-        
-        let result = "";
-        let currentPrefix = "";
+    // Logic for roll number formatting: First is Full, next are last 2 digits
+    function formatAbsentees(absList) {
+        if (absList.length === 0) return "None! All present.";
+        let reportStr = "";
+        let lastPrefix = "";
 
-        absentees.forEach((s, index) => {
-            const roll = s.r;
-            const prefix = roll.substring(0, roll.length - 2);
-            const lastTwo = roll.substring(roll.length - 2);
+        absList.forEach((s, index) => {
+            const fullRoll = s.r;
+            const prefix = fullRoll.substring(0, fullRoll.length - 2);
+            const suffix = fullRoll.substring(fullRoll.length - 2);
 
-            if (prefix !== currentPrefix) {
-                result += (index === 0 ? "" : "\n") + roll;
-                currentPrefix = prefix;
+            if (prefix !== lastPrefix) {
+                reportStr += (index === 0 ? "" : "\n") + fullRoll;
+                lastPrefix = prefix;
             } else {
-                result += ", " + lastTwo;
+                reportStr += ", " + suffix;
             }
         });
-        return result;
+        return reportStr;
     }
 
     function generateReport() {
         const sec = document.getElementById('sec-sel').value;
         const period = document.getElementById('period-sel').value;
-        const absList = students[sec].filter(s => att[s.r] === 'A');
-        const total = students[sec].length;
-        const presentCount = total - absList.length;
-        const date = new Date().toLocaleDateString();
-
+        const abs = students[sec].filter(s => att[s.r] === 'A');
         return `📊 *ATTENDANCE REPORT*
 📝 *Subject:* ECA
 👨‍🏫 *Faculty:* G.Nagarjuna
 📌 *Section:* ${sec} (${period})
-📅 *Date:* ${date}
-✅ *Present:* ${presentCount}
-❌ *Absent:* ${absList.length}
+📅 *Date:* ${new Date().toLocaleDateString()}
 📈 *Percentage:* ${document.getElementById('perc-ui').innerText}
 
 🚫 *ABSENTEES:*
-${formatRollNumbers(absList)}
+${formatAbsentees(abs)}
 
 _Generated by ECE Attendance System_`;
     }
 
-    function shareGroupReport() {
+    // Save Feature
+    function saveRecord() {
         const report = generateReport();
-        window.open(`https://wa.me/?text=${encodeURIComponent(report)}`, '_blank');
+        const records = JSON.parse(localStorage.getItem('attendance_history') || '[]');
+        records.unshift({
+            time: new Date().toLocaleString(),
+            data: report
+        });
+        localStorage.setItem('attendance_history', JSON.stringify(records.slice(0, 30)));
+        alert("Report Saved!");
     }
 
-    function copyToClipboard() {
-        navigator.clipboard.writeText(generateReport());
-        alert("Report copied!");
+    // View Feature
+    function openHistory() {
+        const records = JSON.parse(localStorage.getItem('attendance_history') || '[]');
+        const list = document.getElementById('history-list');
+        list.innerHTML = records.length ? '' : 'No records found.';
+        records.forEach((rec, index) => {
+            const div = document.createElement('div');
+            div.className = 'p-2 mb-2 border rounded bg-light small';
+            div.innerHTML = `<strong>${rec.time}</strong><pre style="white-space:pre-wrap; font-size:11px;">${rec.data}</pre>`;
+            list.appendChild(div);
+        });
+        document.getElementById('history-view').style.display = 'block';
     }
 
-    function sendVoiceSMS() {
+    function closeHistory() { document.getElementById('history-view').style.display = 'none'; }
+    function clearHistory() { if(confirm("Clear all?")) { localStorage.removeItem('attendance_history'); openHistory(); } }
+
+    function shareWA() { window.open(`https://wa.me/?text=${encodeURIComponent(generateReport())}`, '_blank'); }
+    function copyText() { navigator.clipboard.writeText(generateReport()); alert("Copied!"); }
+    
+    function sendSMS() {
         const sec = document.getElementById('sec-sel').value;
         const abs = students[sec].filter(s => att[s.r] === 'A');
-        if (abs.length === 0) return alert("No absentees!");
-        const numbers = abs.map(s => s.p).join(/iPad|iPhone|iPod/.test(navigator.userAgent) ? ',' : ';');
-        window.location.href = `sms:${numbers}?body=${encodeURIComponent(document.getElementById('custom-msg').value)}`;
+        if(!abs.length) return alert("No absentees!");
+        const nums = abs.map(s => s.p).join(/iPad|iPhone|iPod/.test(navigator.userAgent) ? ',' : ';');
+        window.location.href = `sms:${nums}?body=${encodeURIComponent(document.getElementById('custom-msg').value)}`;
     }
 
-    document.getElementById('date-time').innerText = new Date().toDateString();
-    window.onload = loadList;
+    document.getElementById('current-date').innerText = new Date().toDateString();
+    loadList();
 </script>
 </body>
 </html>

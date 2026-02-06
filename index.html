@@ -6,28 +6,30 @@
     <title>ECE Attendance Pro - G. Nagarjuna</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background: #f0f2f5; padding-bottom: 300px; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f0f2f5; padding-bottom: 340px; font-family: 'Segoe UI', sans-serif; }
         .header { background: #1a237e; color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; border-bottom: 4px solid #ffd600; }
-        .student-item { background: white; margin: 8px; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 8px solid #ccc; cursor: pointer; }
+        .student-item { background: white; margin: 8px; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 8px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .is-a { border-left-color: #d32f2f; background: #fff5f5; }
         .is-p { border-left-color: #2e7d32; background: #f1f8f1; }
         .footer { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; border-top: 1px solid #ddd; z-index: 1001; border-radius: 20px 20px 0 0; }
-        .perc-display { font-size: 1.6rem; font-weight: 800; color: #ffd600; }
-        /* History Modal Styling */
-        #history-view { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:2000; padding:20px; }
-        .history-card { background: white; height: 80%; border-radius: 15px; padding: 20px; overflow-y: auto; }
+        .action-btns { display: flex; gap: 8px; }
+        .btn-round { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; color: white; }
+        .bg-wa { background: #25d366; }
+        .bg-call { background: #0d6efd; }
+        #history-view { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; padding:20px; }
+        .history-card { background: white; height: 85%; border-radius: 15px; padding: 20px; overflow-y: auto; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 11px; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
 <div id="history-view">
-    <div class="history-card">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="m-0">📜 Attendance Records</h4>
+    <div class="history-card shadow">
+        <div class="d-flex justify-content-between mb-3">
+            <h5 class="m-0 fw-bold">📜 SAVED REPORTS</h5>
             <button class="btn-close" onclick="closeHistory()"></button>
         </div>
         <div id="history-list"></div>
-        <button class="btn btn-danger w-100 mt-3" onclick="clearHistory()">Clear All Records</button>
     </div>
 </div>
 
@@ -38,8 +40,8 @@
             <small id="current-date" class="opacity-75"></small>
         </div>
         <div class="text-end">
-            <div id="perc-ui" class="perc-display">0%</div>
-            <div style="font-size: 0.7rem; font-weight: bold;">PRESENT</div>
+            <div id="perc-ui" style="font-size: 1.5rem; font-weight: 800; color: #ffd600; line-height:1;">0%</div>
+            <div id="count-ui" style="font-size: 0.7rem; font-weight: bold;">(0/0)</div>
         </div>
     </div>
     
@@ -52,10 +54,8 @@
         </div>
         <div class="col-4">
             <select id="period-sel" class="form-select form-select-sm">
-                <option value="P1">P1</option><option value="P2">P2</option>
-                <option value="P3">P3</option><option value="P4">P4</option>
-                <option value="P5">P5</option><option value="P6">P6</option>
-                <option value="P7">P7</option>
+                <option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option>
+                <option value="P4">P4</option><option value="P5">P5</option><option value="P6">P6</option><option value="P7">P7</option>
             </select>
         </div>
         <div class="col-4">
@@ -71,22 +71,26 @@
 
 <div class="container mt-2" id="list"></div>
 
-<div class="footer">
+<div class="footer shadow-lg">
     <div class="d-flex gap-2 mb-2">
-        <button class="btn btn-primary flex-grow-1 fw-bold" onclick="saveRecord()">💾 SAVE</button>
-        <button class="btn btn-info text-white flex-grow-1 fw-bold" onclick="openHistory()">👁️ VIEW SAVED</button>
+        <button class="btn btn-primary flex-grow-1 fw-bold btn-sm" onclick="saveRecord()">💾 SAVE DATA</button>
+        <button class="btn btn-info text-white flex-grow-1 fw-bold btn-sm" onclick="openHistory()">👁️ VIEW SAVED</button>
     </div>
     
     <div class="mb-2">
-        <textarea id="custom-msg" class="form-control form-control-sm" rows="2">ECE Alert: Your child is ABSENT for ECA class.
-Faculty: G.Nagarjuna
-Voice Note: https://drive.google.com/file/d/14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc/view?usp=drivesdk</textarea>
+        <textarea id="custom-msg" class="form-control form-control-sm" rows="2" style="font-size: 11px;">ATTEDENCE Alert:Respected  పేరెంట్,
+
+        ఈ రోజు మీ వార్డ్ కాలేజ్ లో హాజరు కాలేదని తెలియజేస్తున్నాము.YOUR WARD IS ABSENT TODAY 
+          BHARATH INSTITUTE OF EGINEERING TECHNOLOGY ,
+		  ECE DEPORTMENT,
+		  CLASS INCHARGE G.NAGARJUNA,
+Listen to Voice Note: https://docs.google.com/uc?export=download&id=14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc</textarea>
     </div>
 
-    <div class="row g-2">
-        <div class="col-12"><button class="btn btn-success w-100 fw-bold" onclick="shareWA()">🚀 WHATSAPP REPORT</button></div>
+    <div class="row g-1">
+        <div class="col-12"><button class="btn btn-success w-100 fw-bold" onclick="shareWA()">🚀 SEND GROUP WHATSAPP</button></div>
         <div class="col-6"><button class="btn btn-outline-danger w-100 fw-bold btn-sm" onclick="sendSMS()">🎤 BULK SMS</button></div>
-        <div class="col-6"><button class="btn btn-outline-dark w-100 fw-bold btn-sm" onclick="copyText()">📋 COPY TEXT</button></div>
+        <div class="col-6"><button class="btn btn-outline-dark w-100 fw-bold btn-sm" onclick="copyText()">📋 COPY REPORT</button></div>
     </div>
 </div>
 
@@ -94,7 +98,7 @@ Voice Note: https://drive.google.com/file/d/14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc/vi
     const students = {
         "A": [
             {r: "24E11A04D9", n: "K.bharath", p: "919059144275"},
-            {r: "24E11A0402", n: "P.Kumar", p: "919177937305"}
+            {r: "24E11A0402", n: "P.Kumar", p: "919059144280"}
         ],
         "B": []
     };
@@ -111,8 +115,16 @@ Voice Note: https://drive.google.com/file/d/14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc/vi
             const div = document.createElement('div');
             div.className = 'student-item is-p';
             div.id = `card-${s.r}`;
-            div.onclick = () => toggleAtt(s.r);
-            div.innerHTML = `<div><strong class="d-block">${s.r}</strong><small class="text-muted">${s.n}</small></div>`;
+            div.innerHTML = `
+                <div onclick="toggleAtt('${s.r}')" style="flex-grow:1;">
+                    <strong class="d-block">${s.r}</strong>
+                    <small class="text-muted">${s.n}</small>
+                </div>
+                <div class="action-btns">
+                    <a href="https://wa.me/${s.p}?text=${encodeURIComponent(document.getElementById('custom-msg').value)}" class="btn-round bg-wa">WA</a>
+                    <a href="tel:${s.p}" class="btn-round bg-call">📞</a>
+                </div>
+            `;
             container.appendChild(div);
         });
         updateStats();
@@ -130,25 +142,20 @@ Voice Note: https://drive.google.com/file/d/14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc/vi
         const total = students[sec].length;
         const present = Object.values(att).filter(v => v === 'P').length;
         document.getElementById('perc-ui').innerText = total ? Math.round((present/total)*100) + '%' : '0%';
+        document.getElementById('count-ui').innerText = `(${present}/${total})`;
     }
 
-    // Logic for roll number formatting: First is Full, next are last 2 digits
     function formatAbsentees(absList) {
-        if (absList.length === 0) return "None! All present.";
-        let reportStr = "";
-        let lastPrefix = "";
-
+        if (absList.length === 0) return "All present.";
+        let reportStr = ""; let lastPrefix = "";
         absList.forEach((s, index) => {
             const fullRoll = s.r;
             const prefix = fullRoll.substring(0, fullRoll.length - 2);
             const suffix = fullRoll.substring(fullRoll.length - 2);
-
             if (prefix !== lastPrefix) {
                 reportStr += (index === 0 ? "" : "\n") + fullRoll;
                 lastPrefix = prefix;
-            } else {
-                reportStr += ", " + suffix;
-            }
+            } else { reportStr += ", " + suffix; }
         });
         return reportStr;
     }
@@ -162,7 +169,7 @@ Voice Note: https://drive.google.com/file/d/14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc/vi
 👨‍🏫 *Faculty:* G.Nagarjuna
 📌 *Section:* ${sec} (${period})
 📅 *Date:* ${new Date().toLocaleDateString()}
-📈 *Percentage:* ${document.getElementById('perc-ui').innerText}
+📈 *Percentage:* ${document.getElementById('perc-ui').innerText} ${document.getElementById('count-ui').innerText}
 
 🚫 *ABSENTEES:*
 ${formatAbsentees(abs)}
@@ -170,42 +177,35 @@ ${formatAbsentees(abs)}
 _Generated by ECE Attendance System_`;
     }
 
-    // Save Feature
     function saveRecord() {
         const report = generateReport();
-        const records = JSON.parse(localStorage.getItem('attendance_history') || '[]');
-        records.unshift({
-            time: new Date().toLocaleString(),
-            data: report
-        });
-        localStorage.setItem('attendance_history', JSON.stringify(records.slice(0, 30)));
-        alert("Report Saved!");
+        const records = JSON.parse(localStorage.getItem('att_v3') || '[]');
+        records.unshift({ time: new Date().toLocaleString(), data: report });
+        localStorage.setItem('att_v3', JSON.stringify(records.slice(0, 50)));
+        alert("Report Saved Successfully!");
     }
 
-    // View Feature
     function openHistory() {
-        const records = JSON.parse(localStorage.getItem('attendance_history') || '[]');
+        const records = JSON.parse(localStorage.getItem('att_v3') || '[]');
         const list = document.getElementById('history-list');
-        list.innerHTML = records.length ? '' : 'No records found.';
-        records.forEach((rec, index) => {
+        list.innerHTML = records.length ? '' : 'No data.';
+        records.forEach(rec => {
             const div = document.createElement('div');
-            div.className = 'p-2 mb-2 border rounded bg-light small';
-            div.innerHTML = `<strong>${rec.time}</strong><pre style="white-space:pre-wrap; font-size:11px;">${rec.data}</pre>`;
+            div.className = 'mb-3 border-bottom pb-2';
+            div.innerHTML = `<small class="fw-bold text-primary">${rec.time}</small><pre>${rec.data}</pre>`;
             list.appendChild(div);
         });
         document.getElementById('history-view').style.display = 'block';
     }
 
     function closeHistory() { document.getElementById('history-view').style.display = 'none'; }
-    function clearHistory() { if(confirm("Clear all?")) { localStorage.removeItem('attendance_history'); openHistory(); } }
-
     function shareWA() { window.open(`https://wa.me/?text=${encodeURIComponent(generateReport())}`, '_blank'); }
     function copyText() { navigator.clipboard.writeText(generateReport()); alert("Copied!"); }
     
     function sendSMS() {
         const sec = document.getElementById('sec-sel').value;
         const abs = students[sec].filter(s => att[s.r] === 'A');
-        if(!abs.length) return alert("No absentees!");
+        if(!abs.length) return alert("No absentees marked!");
         const nums = abs.map(s => s.p).join(/iPad|iPhone|iPod/.test(navigator.userAgent) ? ',' : ';');
         window.location.href = `sms:${nums}?body=${encodeURIComponent(document.getElementById('custom-msg').value)}`;
     }

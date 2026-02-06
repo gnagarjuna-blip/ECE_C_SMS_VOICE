@@ -78,14 +78,14 @@
     
     <div class="mb-2">
         <textarea id="custom-msg" class="form-control form-control-sm" rows="2" style="font-size: 11px; background: #fffde7;">
-			ATTENDENCE ALERT :RESPECTED  పేరెంట్,
+			ATTENDENCE    ALERT :RESPECTED  పేరెంట్,
 
         ఈ రోజు మీ వార్డ్ కాలేజ్ లో హాజరు కాలేదని తెలియజేస్తున్నాము.YOUR WARD IS ABSENT TODAY
 			 
           BHARATH INSTITUTE OF EGINEERING TECHNOLOGY ,
 		  
-		  CLASS INCHARGE G.NAGARJUNA.
-Please Call to me to know study details ofyour  ward:</textarea>
+		  CLASS INCHARGE   G.NAGARJUNA.
+Please Call to me to know study details of your  ward:</textarea>
     </div>
 
     <div class="row g-1">
@@ -152,11 +152,10 @@ Please Call to me to know study details ofyour  ward:</textarea>
         const voiceLink = "https://docs.google.com/uc?export=open&id=14v_P3JXTcVrhk6fSwhkdOfF73dSIKvyc";
         
         // Designing the "Colorful" Message
-        const styledMsg = `🟢 *BHARATH COLLEGE(BIET)/ECE ATTENDANCE ALERT* 🟢\n\n` +
+        const styledMsg = `🟢 *BHARAT COLLEGE(BIET)/ECE ATTENDANCE ALERT* 🟢\n\n` +
                           `👤 *Student Name:* ${name.toUpperCase()}\n` +
                           `📝 *Status:* _ABSENT_\n\n` +
                           `${baseMsg}\n\n` +
-                          `▶️ *LISTEN HERE:* \n\n` +
                           `🙏 *Regards,* \n*G. Nagarjuna (ECE Dept)*`;
 
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(styledMsg)}`, '_blank');

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Marks Distribution | Secure</title>
+    <title>Academic Marks Distribution | Rounded</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 40px; background-color: #f4f7f6; color: #333; }
@@ -23,20 +23,20 @@
 <body>
 
 <div class="container">
-    <h2>Secure Marks Distribution System</h2>
+    <h2>Secure Marks Distribution (Whole Numbers Only)</h2>
     <div class="info">
-        <b>Instructions:</b> Upload a file with <b>Roll No</b> and <b>Total Marks</b>. <br>
-        Access to process data requires the administrator password.
+        <b>Settings:</b> Password is <b>nagarjuna</b>. <br>
+        Only 4 questions answered. No decimals. Blanks for unused questions.
     </div>
 
     <div class="upload-section" onclick="document.getElementById('fileInput').click()">
         <input type="file" id="fileInput" accept=".xlsx, .xls, .csv" style="display:none" onchange="handleFileSelect(this)"/>
-        <div id="fileStatus">Click to Upload Student Excel/CSV</div>
+        <div id="fileStatus">Click to Upload Student List</div>
     </div>
 
     <div class="btn-group">
-        <button class="btn-process" onclick="validateAndProcess()">Generate Split Marks</button>
-        <button id="downloadBtn" class="btn-download" onclick="exportToExcel()">Download Processed Excel</button>
+        <button class="btn-process" onclick="validateAndProcess()">Generate Rounded Split</button>
+        <button id="downloadBtn" class="btn-download" onclick="exportToExcel()">Download Excel</button>
     </div>
 
     <div id="status"></div>
@@ -55,18 +55,13 @@
 
     function validateAndProcess() {
         const fileInput = document.getElementById('fileInput');
-        if (!fileInput.files[0]) {
-            alert("Please select a file first.");
-            return;
-        }
+        if (!fileInput.files[0]) { alert("Please select a file."); return; }
 
-        // Password Prompt
-        const userPass = prompt("Enter Administrator Password to continue:");
-        
+        const userPass = prompt("Enter Password:");
         if (userPass === DEFAULT_PASS) {
             processMarks();
         } else if (userPass !== null) {
-            alert("Incorrect Password! Access Denied.");
+            alert("Wrong Password!");
         }
     }
 
@@ -75,24 +70,19 @@
         const reader = new FileReader();
 
         reader.onload = (e) => {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                const rows = XLSX.utils.sheet_to_json(sheet);
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet);
 
-                processedRows = rows.map(row => {
-                    // Mapping columns flexibly
-                    const roll = row["Roll No"] || row["roll no"] || Object.values(row)[0];
-                    const total = parseFloat(row["Total Marks"] || row["total"] || Object.values(row)[1]);
-                    return splitLogic(roll, total);
-                });
+            processedRows = rows.map(row => {
+                const roll = row["Roll No"] || row["roll no"] || Object.values(row)[0];
+                const total = Math.round(parseFloat(row["Total Marks"] || row["total"] || Object.values(row)[1]));
+                return splitLogic(roll, total);
+            });
 
-                document.getElementById('status').innerHTML = `<span style="color: #27ae60;">✔ Access Granted. Split marks generated for ${processedRows.length} students.</span>`;
-                document.getElementById('downloadBtn').style.display = 'inline-block';
-            } catch (err) {
-                alert("Error processing file. Please check the format.");
-            }
+            document.getElementById('status').innerHTML = `<span style="color: #27ae60;">✔ Processed ${processedRows.length} students with rounded marks.</span>`;
+            document.getElementById('downloadBtn').style.display = 'inline-block';
         };
         reader.readAsArrayBuffer(fileInput.files[0]);
     }
@@ -100,43 +90,44 @@
     function splitLogic(roll, total) {
         let remaining = total;
         
-        // 1. Objective (Max 10)
-        let obj = Math.min(remaining, Math.floor(Math.random() * 4) + 7); 
-        if (total <= 10) obj = total;
+        // 1. Objective (Max 10) - Randomly between 5 and 10, but not exceeding remaining
+        let objLimit = Math.min(remaining, 10);
+        let obj = Math.max(0, Math.min(objLimit, Math.floor(Math.random() * 4) + 7));
+        if (remaining <= 10) obj = remaining; 
         remaining -= obj;
 
-        // 2. Assignment (Max 5) - CO1 OR CO2
+        // 2. Assignment (Max 5) - Rounded
         let assCO1 = "", assCO2 = "";
         let assVal = Math.min(remaining, 5);
         if (Math.random() > 0.5) assCO1 = assVal; else assCO2 = assVal;
         remaining -= assVal;
 
-        // 3. Descriptive (Select 4 Questions out of 6)
+        // 3. Descriptive (4 Questions out of 6) - Whole Numbers
         let qs = ["", "", "", "", "", ""]; 
         let chosenIndices = [0, 1, 2, 3, 4, 5].sort(() => 0.5 - Math.random()).slice(0, 4);
         
         chosenIndices.forEach(i => qs[i] = 0);
 
+        // Distribute remaining whole points
         while (remaining > 0) {
             let idx = chosenIndices[Math.floor(Math.random() * chosenIndices.length)];
             if (qs[idx] < 5) {
-                let add = Math.min(remaining, 0.5); 
-                qs[idx] += add;
-                remaining -= add;
+                qs[idx] += 1; // Increment by 1 only
+                remaining -= 1;
             }
             if (chosenIndices.every(i => qs[i] >= 5)) break;
         }
 
-        // Clean up: Convert 0s to blank strings for Excel
-        qs = qs.map(v => (v === 0 || v === "") ? "" : v);
+        // Clean up: 0 to blank
+        qs = qs.map(v => v === 0 ? "" : v);
 
         return {
             "Roll No": roll,
             "Q1(5)": qs[0], "Q2(5)": qs[1], "Q3(5)": qs[2],
             "Q4(5)": qs[3], "Q5(5)": qs[4], "Q6(5)": qs[5],
-            "Objective(10)": obj === 0 ? "" : obj,
-            "Assign-CO1": assCO1 === 0 ? "" : assCO1,
-            "Assign-CO2": assCO2 === 0 ? "" : assCO2,
+            "Objective(10)": obj || "",
+            "Assign-CO1": assCO1 || "",
+            "Assign-CO2": assCO2 || "",
             "Total": total
         };
     }
@@ -145,7 +136,7 @@
         const worksheet = XLSX.utils.json_to_sheet(processedRows);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Marks");
-        XLSX.writeFile(workbook, "Marks_Split_Secure.xlsx");
+        XLSX.writeFile(workbook, "Marks_Rounded_Final.xlsx");
     }
 </script>
 
